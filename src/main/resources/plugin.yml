@@ -1,0 +1,14 @@
+name: TokenLink
+version: 1.0
+main: com.tokenlink.login.TokenLinkPlugin
+api-version: 1.13
+author: SwineFeather
+description: A plugin that allows players to log into a website using a secure, token-based link generated via the /login command.
+commands:
+  login:
+    description: Generate a login link for the website
+    usage: /<command>
+  tokenlink:
+    description: TokenLink plugin management commands
+    usage: /<command> [reload|status|test]
+    permission: tokenlink.admin

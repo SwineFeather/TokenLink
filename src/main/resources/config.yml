@@ -1,0 +1,7 @@
+supabase:
+  url: "https://erdconvorgeupvavlwv.supabase.co"
+  api-key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyZGNvbnZvcmdlY3VwdmF2bHd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1ODM4ODcsImV4cCI6MjA2NTE1OTg4N30.1JAp47oJDpiNmnKjpYB_tS9__0Sytk18o8dL-Dfnrdg"
+logging:
+  enabled: true
+cooldown:
+  seconds: 60

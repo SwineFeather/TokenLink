@@ -17,56 +17,27 @@ serve(async (req) => {
       });
     }
 
-    // First, check if profile exists, if not create it
-    const { data: existingProfile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("player_uuid", player_uuid)
-      .single();
-
-    if (!existingProfile) {
-      // Create new profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({ 
-          player_uuid, 
-          player_name,
-          last_login: new Date().toISOString()
-        });
-
-      if (profileError) {
-        console.error("Error creating profile:", profileError);
-        return new Response(JSON.stringify({ error: "Failed to create profile" }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-    } else {
-      // Update last login for existing profile
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ 
-          last_login: new Date().toISOString(),
-          player_name: player_name // Update name in case it changed
-        })
-        .eq("player_uuid", player_uuid);
-
-      if (updateError) {
-        console.error("Error updating profile:", updateError);
-      }
-    }
-
-    // Store the login token
+    // Store the login token (this should work with your current schema)
     const { error: tokenError } = await supabase
       .from("login_tokens")
-      .insert({ player_uuid, player_name, token, expires_at });
+      .insert({ 
+        player_uuid, 
+        player_name, 
+        token, 
+        expires_at 
+      });
 
     if (tokenError) {
-      return new Response(JSON.stringify({ error: tokenError.message }), {
+      console.error("Token insert error:", tokenError);
+      return new Response(JSON.stringify({ error: "Failed to store token: " + tokenError.message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Note: We're not creating profiles automatically since your schema requires auth.users
+    // The profile creation should happen when the user actually logs in through the website
+    console.log("Token stored successfully for player:", player_name);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

@@ -7,22 +7,10 @@ const supabase = createClient(
   "your-supabase-anon-key"
 );
 
-interface Profile {
-  id: number;
-  player_uuid: string;
-  player_name: string;
-  email?: string;
-  avatar_url?: string;
-  created_at: string;
-  last_login: string;
-  is_active: boolean;
-}
-
 interface LoginResponse {
   valid: boolean;
   player_uuid: string;
   player_name: string;
-  profile?: Profile;
   error?: string;
 }
 
@@ -45,7 +33,7 @@ const Login = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://your-supabase-project.supabase.co/functions/v1/validate-token?token=${token}`
+          `https://erdconvorgecupvavlwv.supabase.co/functions/v1/validate-token?token=${token}`
         );
         const data: LoginResponse = await response.json();
 
@@ -59,9 +47,8 @@ const Login = () => {
         localStorage.setItem("player_uuid", data.player_uuid);
         localStorage.setItem("player_name", data.player_name);
         
-        if (data.profile) {
-          localStorage.setItem("profile", JSON.stringify(data.profile));
-        }
+        // Note: Profile data is handled separately by your existing website
+        // The user will need to complete their profile setup through your existing auth flow
 
         // Create a session or redirect to dashboard
         setTimeout(() => {
@@ -97,6 +84,9 @@ const Login = () => {
           <div className="text-center">
             <div className="text-green-500 text-2xl mb-4">✅</div>
             <p className="text-green-600 font-medium">Login successful!</p>
+            <p className="text-gray-600 mt-2 text-sm">
+              Welcome, {localStorage.getItem("player_name")}!
+            </p>
             <p className="text-gray-600 mt-2 text-sm">
               Redirecting to dashboard...
             </p>

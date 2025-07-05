@@ -44,27 +44,11 @@ serve(async (req) => {
       .update({ used: true })
       .eq("token", token);
 
-    // Get or create profile
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("player_uuid", data.player_uuid)
-      .single();
-
-    if (profileError && profileError.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error("Error fetching profile:", profileError);
-    }
-
-    // Update last login
-    await supabase
-      .from("profiles")
-      .update({ last_login: new Date().toISOString() })
-      .eq("player_uuid", data.player_uuid);
-
+    // Return player information without trying to access profiles table
+    // The website can handle profile creation when the user actually logs in
     return new Response(JSON.stringify({ 
       player_uuid: data.player_uuid, 
       player_name: data.player_name,
-      profile: profile,
       valid: true 
     }), {
       status: 200,

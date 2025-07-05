@@ -41,7 +41,13 @@ public class SupabaseClient {
             .build();
 
         try (Response response = client.newCall(request).execute()) {
-            return response.isSuccessful();
+            if (!response.isSuccessful()) {
+                String responseBody = response.body() != null ? response.body().string() : "No response body";
+                throw new IOException("HTTP " + response.code() + ": " + responseBody);
+            }
+            return true;
+        } catch (Exception e) {
+            throw new IOException("Failed to connect to Supabase at " + url + ": " + e.getMessage(), e);
         }
     }
 }
