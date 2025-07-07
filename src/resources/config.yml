@@ -1,0 +1,7 @@
+supabase:
+  url: "https://your-supabase-project.supabase.co"
+  api-key: "your-supabase-anon-key"
+logging:
+  enabled: true
+cooldown:
+  seconds: 60

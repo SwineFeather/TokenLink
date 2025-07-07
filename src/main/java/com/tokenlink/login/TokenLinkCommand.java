@@ -11,6 +11,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class TokenLinkCommand implements CommandExecutor, TabCompleter {
     private final TokenLinkPlugin plugin;
 
@@ -95,9 +101,57 @@ public class TokenLinkCommand implements CommandExecutor, TabCompleter {
         // Run tests in a separate thread to avoid blocking
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             NetworkTest.testConnectivity(plugin);
+            
+            // Test Edge Functions specifically
+            testEdgeFunctions();
         });
         
         return true;
+    }
+
+    private void testEdgeFunctions() {
+        OkHttpClient client = new OkHttpClient();
+        String baseUrl = plugin.getConfig().getString("supabase.url");
+        
+        // Test validate-token function
+        try {
+            Request request = new Request.Builder()
+                .url(baseUrl + "/functions/v1/validate-token")
+                .get()
+                .build();
+            
+            try (Response response = client.newCall(request).execute()) {
+                if (response.code() == 401) {
+                    plugin.getLogger().warning("✗ validate-token function: 401 Unauthorized - Function may not be deployed");
+                } else if (response.code() == 404) {
+                    plugin.getLogger().warning("✗ validate-token function: 404 Not Found - Function does not exist");
+                } else {
+                    plugin.getLogger().info("✓ validate-token function: HTTP " + response.code());
+                }
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("✗ validate-token function test failed: " + e.getMessage());
+        }
+        
+        // Test store-token function
+        try {
+            Request request = new Request.Builder()
+                .url(baseUrl + "/functions/v1/store-token")
+                .post(RequestBody.create("{}", MediaType.parse("application/json")))
+                .build();
+            
+            try (Response response = client.newCall(request).execute()) {
+                if (response.code() == 401) {
+                    plugin.getLogger().warning("✗ store-token function: 401 Unauthorized - Function may not be deployed");
+                } else if (response.code() == 404) {
+                    plugin.getLogger().warning("✗ store-token function: 404 Not Found - Function does not exist");
+                } else {
+                    plugin.getLogger().info("✓ store-token function: HTTP " + response.code());
+                }
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("✗ store-token function test failed: " + e.getMessage());
+        }
     }
 
     private boolean handleDns(CommandSender sender) {
